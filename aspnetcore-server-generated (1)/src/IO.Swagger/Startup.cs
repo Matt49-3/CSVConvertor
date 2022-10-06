@@ -67,14 +67,16 @@ namespace IO.Swagger
                 .AddScoped<ICsvReaderWrapper,CsvReaderWrapper>()
                 .AddMvc(options =>
                 {
-                    options.InputFormatters.RemoveType<Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonInputFormatter>();
-                    options.OutputFormatters.RemoveType<Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter>();
+                    //options.InputFormatters.RemoveType<Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonInputFormatter>();
+                    //options.OutputFormatters.RemoveType<Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter>();
                 })
-                /*.AddNewtonsoftJson(opts =>
+                /*
+                .AddNewtonsoftJson(opts =>
                 {
                     opts.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                     opts.SerializerSettings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy()));
                 })*/
+                .AddXmlDataContractSerializerFormatters()
                 .AddXmlSerializerFormatters();
                 
 

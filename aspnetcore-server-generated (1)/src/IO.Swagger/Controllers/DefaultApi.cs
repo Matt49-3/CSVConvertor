@@ -27,6 +27,7 @@ using Microsoft.Extensions.Primitives;
 using System.Net.Http;
 using System.Text;
 using CsvHelper;
+using CsvHelper.Configuration;
 
 namespace IO.Swagger.Controllers
 {
@@ -57,10 +58,10 @@ namespace IO.Swagger.Controllers
         [ValidateModelState]
         [SwaggerOperation("Convert")]
         [Produces("application/json","text/xml")]
-        [SwaggerResponse(statusCode: 200, type: typeof(List<Dictionary<string, Object>>), description: "The transformation result")]
+        [SwaggerResponse(statusCode: 200, type: typeof(List<IDictionary<string, Object>>), description: "The transformation result")]
         [SwaggerResponse(statusCode: 400, type: typeof(string), description: "The CSV is badly formatted")]
         [SwaggerResponse(statusCode: 0, type: typeof(string), description: "Internal server error")]
-        public async virtual IAsyncEnumerable<dynamic> Convert([FromQuery][Required()]string csvUri)
+        public async virtual IAsyncEnumerable<IDictionary<string, Object>> Convert([FromQuery][Required()]string csvUri,string separator=";")
         { 
             //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(200, default(List<Dictionary<string, Object>>));
@@ -78,7 +79,7 @@ namespace IO.Swagger.Controllers
             */    
             //try
             //{
-                
+          
                 var client = new HttpClient();
                 HttpResponseMessage response;
                 using (response = await client.GetAsync(csvUri))
@@ -86,11 +87,16 @@ namespace IO.Swagger.Controllers
                     using (Stream stream = await response.Content.ReadAsStreamAsync())
                     {
                         using (StreamReader streamReader = new StreamReader(stream, Encoding.UTF8))
-                        using (CsvReader csvReader = new CsvReader(streamReader, CultureInfo.InvariantCulture))
                         {
-                            await foreach (var item in csvReader.GetRecordsAsync<dynamic>())
+                            var readerConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture);
+                            readerConfiguration.Delimiter = separator;
+                            using (CsvReader csvReader = new CsvReader(streamReader, readerConfiguration))
                             {
-                                yield return item;
+
+                                await foreach (var item in csvReader.GetRecordsAsync<dynamic>())
+                                {
+                                    yield return item as IDictionary<string,object>;
+                                }
                             }
                         }
                     }
