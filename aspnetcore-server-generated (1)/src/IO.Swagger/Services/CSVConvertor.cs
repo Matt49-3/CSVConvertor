@@ -12,7 +12,7 @@ namespace IO.Swagger.Services;
 
 public interface ICsvConvertor
 {
-    public IAsyncEnumerable<dynamic> Convert(string csvUri);
+    public IAsyncEnumerable<IDictionary<string, Object>> Convert(string csvUri);
 }
 
 public class CsvConvertor : ICsvConvertor
@@ -27,12 +27,16 @@ public class CsvConvertor : ICsvConvertor
     }
     
     
-    public async IAsyncEnumerable<dynamic> Convert(string csvUri)
+    public async IAsyncEnumerable<IDictionary<string, Object>> Convert(string csvUri)
     {
         using (Stream stream = await _httpHandler.GetAsyncStream(csvUri))
         {
             using (StreamReader streamReader = new StreamReader(stream, Encoding.UTF8))
-                yield return _csvReaderWrapper.GetRecordsAsync<dynamic>(streamReader);
+                //yield return _csvReaderWrapper.GetRecordsAsync(streamReader);
+                await foreach (var item in _csvReaderWrapper.GetRecordsAsync(streamReader))
+                {
+                    yield return item;
+                }
         }
     }
 }

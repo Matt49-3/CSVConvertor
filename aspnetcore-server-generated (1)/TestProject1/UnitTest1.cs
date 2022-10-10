@@ -8,7 +8,7 @@ namespace TestProject1;
 public class TestCsvConvertor
 {
     [Fact]
-    public void IfFileNotFoundReturnException()
+    public async Task<IAsyncEnumerable<IDictionary<string,object>>> IfFileNotFoundReturnException()
     {
         
         var mockHttpHandler = new Mock<IHttpHandler>();
@@ -19,9 +19,13 @@ public class TestCsvConvertor
         
         var csvConvert = new CsvConvertor(mockHttpHandler.Object, mockCsvReaderWrapper.Object);
    
-        Assert.Throws<FileNotFoundException>(() =>csvConvert.Convert(csvuri));
+        await Assert.ThrowsAsync<FileNotFoundException>(
+            () =>csvConvert.Convert(csvuri));
+        
+      
     }
-
+    
+    [Fact]
     public void ReturnIAsyncEnumerableWith()
     {
         var mockHttpHandler = new Mock<IHttpHandler>();

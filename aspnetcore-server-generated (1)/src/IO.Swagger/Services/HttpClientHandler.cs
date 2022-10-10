@@ -17,10 +17,11 @@ public class HttpClientHandler : IHttpHandler
 
     public async Task<Stream> GetAsyncStream(string url)
     {
-        using (var response = await _client.GetAsync(url)){ 
+        //using (var response = await _client.GetAsync(url)){ 
+        var response = await _client.GetAsync(url);
             if (!response.IsSuccessStatusCode) throw new FileNotFoundException(url);
             return await response.Content.ReadAsStreamAsync();
-        }
+        //}
     }
 
     public async Task<HttpResponseMessage> GetAsync(string url)

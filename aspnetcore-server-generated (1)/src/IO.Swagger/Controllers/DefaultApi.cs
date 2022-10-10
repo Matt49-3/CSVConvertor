@@ -76,43 +76,13 @@ namespace IO.Swagger.Controllers
             if (acceptHeaderValues.Contains(System.Net.Mime.MediaTypeNames.Application.Json))
                 
             else if (acceptHeaderValues.Contains(System.Net.Mime.MediaTypeNames.Text.Xml))
-            */    
-            //try
-            //{
-          
-                var client = new HttpClient();
-                HttpResponseMessage response;
-                using (response = await client.GetAsync(csvUri))
-                {
-                    using (Stream stream = await response.Content.ReadAsStreamAsync())
-                    {
-                        using (StreamReader streamReader = new StreamReader(stream, Encoding.UTF8))
-                        {
-                            var readerConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture);
-                            readerConfiguration.Delimiter = separator;
-                            using (CsvReader csvReader = new CsvReader(streamReader, readerConfiguration))
-                            {
+            */
 
-                                await foreach (var item in csvReader.GetRecordsAsync<dynamic>())
-                                {
-                                    yield return item as IDictionary<string,object>;
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                
-                //return Ok(resultBuilder.Build( _csvConvertor.Convert(csvUri)));
-                //return Ok(_csvConvertor.Convert(csvUri));
-                //return _csvConvertor.Convert(csvUri);
-            //}
-            //catch (Exception e)
-            //{
-                //return StatusCode(400, e.ToString());
-                //return null;
-            //}
-            
+            await foreach (var item in _csvConvertor.Convert(csvUri))
+          {
+              yield return item;
+          }
+
         }
     }
 }
